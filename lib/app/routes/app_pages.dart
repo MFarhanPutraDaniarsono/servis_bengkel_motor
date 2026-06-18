@@ -1,6 +1,9 @@
 import 'package:get/get.dart';
 
 import '../modules/auth/views/login_view.dart';
+import '../modules/auth/views/register_view.dart';
+import '../modules/auth/views/otp_view.dart';
+
 import '../modules/dashboard/views/dashboard_view.dart';
 import '../modules/dashboard/bindings/dashboard_binding.dart';
 
@@ -28,6 +31,18 @@ class AppPages {
       page: () => const LoginPage(),
     ),
 
+    // 🔹 REGISTER
+    GetPage(
+      name: AppRoutes.register,
+      page: () => const RegisterPage(),
+    ),
+
+    // 🔹 OTP
+    GetPage(
+      name: AppRoutes.otp,
+      page: () => const OtpPage(),
+    ),
+
     // 🔹 DASHBOARD
     GetPage(
       name: AppRoutes.dashboard,
@@ -35,7 +50,7 @@ class AppPages {
       binding: DashboardBinding(),
     ),
 
-    // 🔹 AKUN + BINDING
+    // 🔹 AKUN
     GetPage(
       name: AppRoutes.akun,
       page: () => const AkunPage(),

@@ -2,21 +2,71 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:capstone/app/routes/app_routes.dart';
+import 'package:capstone/app/data/services/auth_service.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  final AuthService authService = AuthService();
+
+  // =========================
+  // CONTROLLER DATA BENGKEL
+  // =========================
+  final TextEditingController workshopNameController =
+      TextEditingController();
+
+  final TextEditingController workshopPhoneController =
+      TextEditingController();
+
+  final TextEditingController cityController =
+      TextEditingController();
+
+  final TextEditingController addressController =
+      TextEditingController();
+
+  // =========================
+  // CONTROLLER DATA PEMILIK
+  // =========================
+  final TextEditingController ownerNameController =
+      TextEditingController();
+
+  final TextEditingController ownerPhoneController =
+      TextEditingController();
+
+  final TextEditingController passwordController =
+      TextEditingController();
+
+  final TextEditingController confirmController =
+      TextEditingController();
+
+  @override
+  void dispose() {
+    workshopNameController.dispose();
+    workshopPhoneController.dispose();
+    cityController.dispose();
+    addressController.dispose();
+
+    ownerNameController.dispose();
+    ownerPhoneController.dispose();
+    passwordController.dispose();
+    confirmController.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          const Color(0xFFEFEFEF),
-
+      backgroundColor: const Color(0xFFEFEFEF),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(
+            padding: const EdgeInsets.symmetric(
               horizontal: 20,
             ),
             child: Column(
@@ -29,8 +79,7 @@ class RegisterPage extends StatelessWidget {
                 Row(
                   children: [
                     IconButton(
-                      onPressed: () =>
-                          Get.back(),
+                      onPressed: () => Get.back(),
                       icon: const Icon(
                         Icons.arrow_back,
                       ),
@@ -63,79 +112,55 @@ class RegisterPage extends StatelessWidget {
 
                 const SizedBox(height: 10),
 
-                buildLabel(
-                  "Nama Bengkel",
+                buildLabel("Nama Bengkel"),
+                buildField(
+                  controller:
+                      workshopNameController,
                 ),
-                buildField(),
 
                 buildLabel(
                   "No. Handphone Bengkel",
                 ),
-                buildField(),
+                buildField(
+                  controller:
+                      workshopPhoneController,
+                ),
 
                 buildLabel(
                   "Kota / Kabupaten Bengkel",
                 ),
                 buildField(
+                  controller: cityController,
                   hint:
                       "Pilih Kota / Kabupaten Bengkel",
                 ),
 
-                buildLabel(
-                  "Alamat Bengkel",
-                ),
-                buildField(),
-
-                const SizedBox(height: 15),
-
-                const Text(
-                  "Jenis Bengkel",
-                ),
-
-                const SizedBox(height: 5),
-
-                const Row(
-                  children: [
-                    Icon(
-                      Icons
-                          .radio_button_unchecked,
-                    ),
-                    SizedBox(width: 5),
-                    Text(
-                      "Mobil / Motor",
-                    ),
-                  ],
-                ),
-
-                const Row(
-                  children: [
-                    Icon(
-                      Icons
-                          .radio_button_unchecked,
-                    ),
-                    SizedBox(width: 5),
-                    Text(
-                      "Lainnya, Misal : Las, Bubut",
-                    ),
-                  ],
+                buildLabel("Alamat Bengkel"),
+                buildField(
+                  controller:
+                      addressController,
                 ),
 
                 const SizedBox(height: 15),
 
-                const Text(
-                  "Data Pemilik",
-                ),
+                const Text("Data Pemilik"),
 
                 buildLabel("Nama"),
-                buildField(),
-
-                buildLabel(
-                  "No. Handphone",
+                buildField(
+                  controller:
+                      ownerNameController,
                 ),
-                buildField(),
+
+                buildLabel("No. Handphone"),
+                buildField(
+                  controller:
+                      ownerPhoneController,
+                ),
 
                 buildLabel("Password"),
                 buildField(
+                  controller:
+                      passwordController,
                   obscure: true,
                 ),
 
@@ -143,12 +168,13 @@ class RegisterPage extends StatelessWidget {
                   "Konfirmasi Password",
                 ),
                 buildField(
+                  controller:
+                      confirmController,
                   obscure: true,
                 ),
 
                 const SizedBox(height: 20),
 
-                // 🔥 BUTTON REGISTER
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -159,14 +185,93 @@ class RegisterPage extends StatelessWidget {
                       backgroundColor:
                           Colors.blue[800],
                     ),
-                    onPressed: () {
-                      // 🔥 GETX ROUTE
-                      Get.offAllNamed(
-                        AppRoutes.dashboard,
-                      );
+                    onPressed: () async {
+                      // VALIDASI
+                      if (workshopNameController
+                              .text
+                              .isEmpty ||
+                          workshopPhoneController
+                              .text
+                              .isEmpty ||
+                          ownerNameController
+                              .text
+                              .isEmpty ||
+                          ownerPhoneController
+                              .text
+                              .isEmpty ||
+                          passwordController
+                              .text
+                              .isEmpty) {
+                        Get.snackbar(
+                          'Error',
+                          'Data tidak lengkap',
+                        );
+                        return;
+                      }
+
+                      if (passwordController.text !=
+                          confirmController.text) {
+                        Get.snackbar(
+                          'Error',
+                          'Konfirmasi password tidak cocok',
+                        );
+                        return;
+                      }
+
+                      try {
+                        final response =
+                            await authService
+                                .register(
+                          ownerName:
+                              ownerNameController
+                                  .text
+                                  .trim(),
+                          ownerPhone:
+                              ownerPhoneController
+                                  .text
+                                  .trim(),
+                          workshopName:
+                              workshopNameController
+                                  .text
+                                  .trim(),
+                          workshopPhone:
+                              workshopPhoneController
+                                  .text
+                                  .trim(),
+                          password:
+                              passwordController
+                                  .text
+                                  .trim(),
+                        );
+
+                        if (response['message'] ==
+                            'Register berhasil') {
+                          Get.snackbar(
+                            'Sukses',
+                            'Registrasi berhasil',
+                          );
+
+                          Get.offAllNamed(
+                            AppRoutes.otp,
+                            arguments:response['phone']
+                          );
+                        } else {
+                          Get.snackbar(
+                            'Gagal',
+                            response['message']
+                                .toString(),
+                          );
+                        }
+                      } catch (e) {
+                        Get.snackbar(
+                          'Error',
+                          e.toString(),
+                        );
+                      }
                     },
-                    child:
-                        const Text("Masuk"),
+                    child: const Text(
+                      "Masuk",
+                    ),
                   ),
                 ),
 
@@ -179,10 +284,7 @@ class RegisterPage extends StatelessWidget {
     );
   }
 
-  // 🔧 Helper
-  static Widget buildLabel(
-    String text,
-  ) {
+  static Widget buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(
         top: 10,
@@ -192,13 +294,16 @@ class RegisterPage extends StatelessWidget {
   }
 
   static Widget buildField({
+    TextEditingController? controller,
     String? hint,
     bool obscure = false,
   }) {
     return Padding(
-      padding:
-          const EdgeInsets.only(top: 5),
+      padding: const EdgeInsets.only(
+        top: 5,
+      ),
       child: TextField(
+        controller: controller,
         obscureText: obscure,
         decoration: InputDecoration(
           hintText: hint,

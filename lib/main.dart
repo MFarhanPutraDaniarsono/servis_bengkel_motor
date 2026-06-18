@@ -1,9 +1,14 @@
 import 'package:capstone/app/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'app/routes/app_pages.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await GetStorage.init();
+
   runApp(const MyApp());
 }
 
@@ -16,7 +21,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Capstone',
 
-      initialRoute: AppRoutes.login,  
+      initialRoute: AppRoutes.login,
       getPages: AppPages.routes,
     );
   }

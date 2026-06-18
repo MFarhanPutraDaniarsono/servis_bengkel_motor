@@ -1,11 +1,78 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import 'package:capstone/app/modules/auth/views/register_view.dart';
 import 'package:capstone/app/routes/app_routes.dart';
+import 'package:capstone/app/data/services/auth_service.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final phoneController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  final AuthService authService = AuthService();
+
+  bool isLoading = false;
+
+  Future<void> login() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      final response = await authService.login(
+        phoneController.text.trim(),
+        passwordController.text.trim(),
+      );
+
+      if (response['token'] != null) {
+        await GetStorage().write(
+          'token',
+          response['token'],
+        );
+
+        Get.snackbar(
+          'Berhasil',
+          'Login berhasil',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+
+        Get.offAllNamed(
+          AppRoutes.dashboard,
+        );
+      } else {
+        Get.snackbar(
+          'Gagal',
+          response['message'] ?? 'Login gagal',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    phoneController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +131,6 @@ class LoginPage extends StatelessWidget {
 
                     const SizedBox(height: 20),
 
-                    // 🔵 TITLE
                     const Text(
                       "BMA",
                       style: TextStyle(
@@ -96,7 +162,6 @@ class LoginPage extends StatelessWidget {
                       ),
                       child: Column(
                         children: [
-                          // No HP
                           const Align(
                             alignment:
                                 Alignment.centerLeft,
@@ -107,6 +172,10 @@ class LoginPage extends StatelessWidget {
                           const SizedBox(height: 5),
 
                           TextField(
+                            controller:
+                                phoneController,
+                            keyboardType:
+                                TextInputType.phone,
                             decoration:
                                 InputDecoration(
                               filled: true,
@@ -127,7 +196,6 @@ class LoginPage extends StatelessWidget {
 
                           const SizedBox(height: 15),
 
-                          // Password
                           const Align(
                             alignment:
                                 Alignment.centerLeft,
@@ -137,6 +205,8 @@ class LoginPage extends StatelessWidget {
                           const SizedBox(height: 5),
 
                           TextField(
+                            controller:
+                                passwordController,
                             obscureText: true,
                             decoration:
                                 InputDecoration(
@@ -181,15 +251,20 @@ class LoginPage extends StatelessWidget {
                                 backgroundColor:
                                     Colors.blue[800],
                               ),
-                              onPressed: () {
-                                // 🔥 GETX ROUTE
-                                Get.offAllNamed(
-                                  AppRoutes
-                                      .dashboard,
-                                );
-                              },
+                              onPressed:
+                                  isLoading
+                                      ? null
+                                      : login,
                               child:
-                                  const Text("Masuk"),
+                                  isLoading
+                                      ? const CircularProgressIndicator(
+                                        color:
+                                            Colors
+                                                .white,
+                                      )
+                                      : const Text(
+                                        "Masuk",
+                                      ),
                             ),
                           ),
                         ],

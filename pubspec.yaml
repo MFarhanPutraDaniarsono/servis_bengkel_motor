@@ -10,11 +10,20 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
   intl: ^0.19.0
   cupertino_icons: ^1.0.8
   image_picker: ^1.0.7
-  get: ^4.6.6   # 🔥 TAMBAHAN GETX
   mobile_scanner: ^3.5.0
+
+  # GETX
+  get: ^4.6.6
+
+  # API
+  http: ^1.2.2
+
+  # Local Storage JWT
+  get_storage: ^2.1.1
 
 dev_dependencies:
   flutter_test:
